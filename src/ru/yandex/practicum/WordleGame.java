@@ -3,10 +3,10 @@ package ru.yandex.practicum;
 import java.io.PrintWriter;
 import java.util.*;
 
-
 public class WordleGame {
 
     private static final int MAX_STEPS = 6;
+    private static final int MAX_HINTS = 3;
 
     private final WordleDictionary dictionary;
     private final PrintWriter log;
@@ -61,6 +61,10 @@ public class WordleGame {
 
     public boolean isOver() {
         return isWon() || remainingSteps <= 0;
+    }
+
+    public int getRemainingHints() {
+        return MAX_HINTS - hintsGiven.size();
     }
 
     public String makeGuess(String rawInput)
@@ -154,6 +158,11 @@ public class WordleGame {
     }
 
     public String suggestWord() {
+        if (getRemainingHints() <= 0) {
+            log.println("Запрошена подсказка, но лимит подсказок исчерпан.");
+            return null;
+        }
+
         List<String> candidates = new ArrayList<>();
 
         outer:
@@ -189,7 +198,7 @@ public class WordleGame {
 
         String chosen = candidates.get(random.nextInt(candidates.size()));
         hintsGiven.add(chosen);
-        log.println("Подсказка: " + chosen);
+        log.println("Подсказка: " + chosen + " (осталось подсказок: " + getRemainingHints() + ")");
         return chosen;
     }
 }

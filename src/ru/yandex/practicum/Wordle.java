@@ -24,19 +24,37 @@ public class Wordle {
                 System.out.println("Добро пожаловать в Wordle по-русски!");
                 System.out.println("Угадайте слово из 5 русских букв. У вас 6 попыток.");
                 System.out.println("Нажмите Enter на пустой строке, чтобы получить подсказку.");
+                System.out.println("Введите слово \"стоп\", чтобы завершить игру досрочно.");
                 System.out.println();
 
+                boolean aborted = false;
+
                 while (!game.isOver()) {
-                    System.out.println("Осталось попыток: " + game.getRemainingSteps());
-                    System.out.print("Ваше слово: ");
-                    String input = scanner.nextLine();
+                    System.out.println("Осталось попыток: " + game.getRemainingSteps()
+                            + ", подсказок: " + game.getRemainingHints());
+                    System.out.print("Ваше слово (или \"стоп\" для выхода): ");
+                    String input = scanner.nextLine().trim();
+
+                    if ("стоп".equalsIgnoreCase(input)) {
+                        System.out.println("Игра прервана. Загаданное слово: " + game.getAnswer());
+                        log.println("Игра остановлена пользователем командой \"стоп\".");
+                        aborted = true;
+                        break;
+                    }
 
                     if (input.isEmpty()) {
+                        if (game.getRemainingHints() <= 0) {
+                            System.out.println("Подсказки закончились.");
+                            System.out.println();
+                            continue;
+                        }
+
                         String hint = game.suggestWord();
                         if (hint == null) {
                             System.out.println("Подходящих подсказок не найдено.");
                         } else {
                             System.out.println("Подсказка: " + hint);
+                            System.out.println("Осталось подсказок: " + game.getRemainingHints());
                         }
                         System.out.println();
                         continue;
@@ -57,10 +75,12 @@ public class Wordle {
                     }
                 }
 
-                if (game.isWon()) {
-                    System.out.println("Поздравляем! Вы отгадали слово: " + game.getAnswer());
-                } else {
-                    System.out.println("Попытки закончились. Загаданное слово: " + game.getAnswer());
+                if (!aborted) {
+                    if (game.isWon()) {
+                        System.out.println("Поздравляем! Вы отгадали слово: " + game.getAnswer());
+                    } else {
+                        System.out.println("Попытки закончились. Загаданное слово: " + game.getAnswer());
+                    }
                 }
             }
 
